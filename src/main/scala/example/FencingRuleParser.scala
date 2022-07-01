@@ -57,5 +57,6 @@ trait FencingPredicate{
 case class And(p1: FencingPredicate, p2: FencingPredicate) extends FencingPredicate
 case class Or(p1: FencingPredicate, p2: FencingPredicate) extends FencingPredicate
 case class Not(p1: FencingPredicate) extends FencingPredicate
+
 case class IsRateOwner(name:String) extends FencingPredicate
 case class IsRatePlanCode(name:String) extends FencingPredicate
