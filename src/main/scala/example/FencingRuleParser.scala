@@ -11,7 +11,6 @@ object FencingRuleParser  {
     triedUnit match {
       case Failure(parserError:ParseError) =>
         println(parserError.toString())
-        parserError.traces.foreach(        println)
         throw parserError
       case Success(value) => value
     }
@@ -22,11 +21,21 @@ object FencingRuleParser  {
 class FencingRuleParser(val input:ParserInput) extends Parser{
   def InputLine = rule { Expression ~ EOI }
 
-  def Expression: Rule1[FencingPredicate] = rule { WS ~ Factor ~ WS  }
+  def Expression: Rule1[FencingPredicate] = rule { WS ~ Term ~ WS  }
+
+  def Term:Rule1[FencingPredicate] = rule {
+    Factor ~ zeroOrMore(
+      AndParser ~ Factor ~> ( (x,y) => And(x,y))
+      | OrParser ~ Factor ~> ( (x,y) => Or(x,y))
+    )
+  }
 
   def Factor:Rule1[FencingPredicate] = rule { (FencingPredicate | Parens) }
 
   def Parens: Rule1[FencingPredicate] = rule { '(' ~ Expression ~ ')' }
+
+  def AndParser = rule { WS ~ "And" ~ WS }
+  def OrParser = rule { WS ~ "Or" ~ WS }
 
   def FencingPredicate:Rule1[FencingPredicate] = rule { IsRateOwnerParser | IsRatePlanCodeParser }
 
@@ -40,7 +49,7 @@ class FencingRuleParser(val input:ParserInput) extends Parser{
 
 trait FencingPredicate
 
-case class And(p1: FencingPredicate, p2: FencingPredicate)
-case class Or(p1: FencingPredicate, p2: FencingPredicate)
+case class And(p1: FencingPredicate, p2: FencingPredicate) extends FencingPredicate
+case class Or(p1: FencingPredicate, p2: FencingPredicate) extends FencingPredicate
 case class IsRateOwner(name:String) extends FencingPredicate
 case class IsRatePlanCode(name:String) extends FencingPredicate

@@ -35,4 +35,12 @@ class FencingRuleParserSpec extends AnyFlatSpec with Matchers {
     FencingRuleParser.parse("   ( ( (     IsRatePlanCode(  'WMT'    ) ) )  )   ") must be(IsRatePlanCode("WMT"))
   }
 
+  it should "parse And composed predicates" in {
+    FencingRuleParser.parse("IsRatePlanCode('WMT') And IsRateOwner('Dhisco')") must be(And(IsRatePlanCode("WMT"), IsRateOwner("Dhisco")))
+  }
+
+  it should "parse Or composed predicates" in {
+    FencingRuleParser.parse("IsRatePlanCode('WMT') Or IsRateOwner('Dhisco')") must be(Or(IsRatePlanCode("WMT"), IsRateOwner("Dhisco")))
+  }
+
 }
