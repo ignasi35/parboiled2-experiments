@@ -72,5 +72,30 @@ class FencingRuleParserSpec extends AnyFlatSpec with Matchers {
     )
 
   }
+  it should "parse a composition of And, Or and Not predicates with ambiguous lack of parens" in {
+    FencingRuleParser.parse(
+      """
+        |   IsRatePlanCode('3HP')
+        |  And
+        |   Not IsRatePlanCode('WMT')
+        |  And (
+        |    IsRateOwner('Dhisco') Or IsRateOwner('Agoda')
+        |  )
+        |
+        |""".stripMargin
+    ) must be(
+      And(
+        And(
+          IsRatePlanCode("3HP"),
+          Not(IsRatePlanCode("WMT"))
+          ),
+        Or(
+          IsRateOwner("Dhisco"),
+          IsRateOwner("Agoda")
+        )
+      )
+    )
+
+  }
 
 }

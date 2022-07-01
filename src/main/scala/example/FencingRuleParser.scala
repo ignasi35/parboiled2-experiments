@@ -37,7 +37,7 @@ class FencingRuleParser(val input:ParserInput) extends Parser{
 
   def AndParser = rule { WS ~ "And" ~ WS }
   def OrParser = rule { WS ~ "Or" ~ WS }
-  def NotParser = rule { "Not" ~ Expression  ~> (x => Not(x)) }
+  def NotParser = rule { "Not" ~ WS ~ Factor  ~> (x => Not(x)) }
 
   def FencingPredicate:Rule1[FencingPredicate] = rule { IsRateOwnerParser | IsRatePlanCodeParser }
 
