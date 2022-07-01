@@ -27,4 +27,12 @@ class FencingRuleParserSpec extends AnyFlatSpec with Matchers {
     FencingRuleParser.parse("IsRatePlanCode('WMT')") must be(IsRatePlanCode("WMT"))
   }
 
+  it should "parse an arbitrary amount of properly closed pairs of parens" in {
+    FencingRuleParser.parse("(((IsRatePlanCode('WMT'))))") must be(IsRatePlanCode("WMT"))
+  }
+
+  it should "ignore blankspaces between predicates" in {
+    FencingRuleParser.parse("   ( ( (     IsRatePlanCode(  'WMT'    ) ) )  )   ") must be(IsRatePlanCode("WMT"))
+  }
+
 }
