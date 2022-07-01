@@ -43,4 +43,34 @@ class FencingRuleParserSpec extends AnyFlatSpec with Matchers {
     FencingRuleParser.parse("IsRatePlanCode('WMT') Or IsRateOwner('Dhisco')") must be(Or(IsRatePlanCode("WMT"), IsRateOwner("Dhisco")))
   }
 
+  it should "parse Not to negate predicates" in {
+    FencingRuleParser.parse("Not IsRatePlanCode('WMT')") must be(Not(IsRatePlanCode("WMT")))
+  }
+
+  it should "parse a composition of And, Or and Not predicates" in {
+    FencingRuleParser.parse(
+      """
+        |   IsRatePlanCode('3HP')
+        |  And
+        |   (Not IsRatePlanCode('WMT'))
+        |  And (
+        |    IsRateOwner('Dhisco') Or IsRateOwner('Agoda')
+        |  )
+        |
+        |""".stripMargin
+    ) must be(
+      And(
+        And(
+          IsRatePlanCode("3HP"),
+          Not(IsRatePlanCode("WMT"))
+          ),
+        Or(
+          IsRateOwner("Dhisco"),
+          IsRateOwner("Agoda")
+        )
+      )
+    )
+
+  }
+
 }

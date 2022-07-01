@@ -7,10 +7,11 @@ import org.parboiled2._
 object FencingRuleParser  {
 
   def parse(input: String): FencingPredicate = {
-    val triedUnit = new FencingRuleParser(input).InputLine.run()
+    val parser = new FencingRuleParser(input)
+    val triedUnit = parser.InputLine.run()
     triedUnit match {
       case Failure(parserError:ParseError) =>
-        println(parserError.toString())
+        println(parser.formatError(parserError))
         throw parserError
       case Success(value) => value
     }
@@ -30,12 +31,13 @@ class FencingRuleParser(val input:ParserInput) extends Parser{
     )
   }
 
-  def Factor:Rule1[FencingPredicate] = rule { (FencingPredicate | Parens) }
+  def Factor:Rule1[FencingPredicate] = rule { (FencingPredicate | Parens | NotParser) }
 
   def Parens: Rule1[FencingPredicate] = rule { '(' ~ Expression ~ ')' }
 
   def AndParser = rule { WS ~ "And" ~ WS }
   def OrParser = rule { WS ~ "Or" ~ WS }
+  def NotParser = rule { "Not" ~ Expression  ~> (x => Not(x)) }
 
   def FencingPredicate:Rule1[FencingPredicate] = rule { IsRateOwnerParser | IsRatePlanCodeParser }
 
@@ -44,12 +46,16 @@ class FencingRuleParser(val input:ParserInput) extends Parser{
 
   def Alphanumerics = rule { oneOrMore(CharPredicate.AlphaNum) }
 
-  def WS      = rule { zeroOrMore(anyOf(" \t \n")) }
+  def WS = rule { zeroOrMore(anyOf(" \t \n")) }
 }
 
-trait FencingPredicate
+trait FencingPredicate{
+  def and(p2: FencingPredicate) = And.apply(this, p2)
+  def or(p2: FencingPredicate) = Or.apply(this, p2)
+}
 
 case class And(p1: FencingPredicate, p2: FencingPredicate) extends FencingPredicate
 case class Or(p1: FencingPredicate, p2: FencingPredicate) extends FencingPredicate
+case class Not(p1: FencingPredicate) extends FencingPredicate
 case class IsRateOwner(name:String) extends FencingPredicate
 case class IsRatePlanCode(name:String) extends FencingPredicate
