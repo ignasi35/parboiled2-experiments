@@ -20,9 +20,10 @@ class FencingRuleParser(val input:ParserInput) extends Parser{
 
   def Parens: Rule1[FencingPredicate] = rule { '(' ~ Expression ~ ')' }
 
-  def FencingPredicate:Rule1[FencingPredicate] = rule { IsRateOwnerParser }
+  def FencingPredicate:Rule1[FencingPredicate] = rule { IsRateOwnerParser | IsRatePlanCodeParser }
 
   def IsRateOwnerParser:Rule1[FencingPredicate]  = rule{ "IsRateOwner('" ~ capture(Alphanumerics) ~ "')" ~>(name => IsRateOwner(name))}
+  def IsRatePlanCodeParser:Rule1[FencingPredicate]  = rule{ "IsRatePlanCode('" ~ capture(Alphanumerics) ~ "')" ~>(name => IsRatePlanCode(name))}
 
   def Alphanumerics = rule { oneOrMore(CharPredicate.AlphaNum) }
 
@@ -32,4 +33,5 @@ trait FencingPredicate
 
 case class And(p1: FencingPredicate, p2: FencingPredicate)
 case class Or(p1: FencingPredicate, p2: FencingPredicate)
-case class IsRateOwner(ownerName:String) extends FencingPredicate
+case class IsRateOwner(name:String) extends FencingPredicate
+case class IsRatePlanCode(name:String) extends FencingPredicate

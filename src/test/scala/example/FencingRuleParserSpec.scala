@@ -23,8 +23,8 @@ class FencingRuleParserSpec extends AnyFlatSpec with Matchers {
     FencingRuleParser.parse("IsRateOwner('name123')") must be(IsRateOwner("name123"))
   }
 
-  it should "parse a IsRateOwner('name123') restriction" in {
-    FencingRuleParser.parse("IsRateOwner('name123')") must be(IsRateOwner("name123"))
+  it should "parse a IsRatePlanCode('WMT') restriction" in {
+    FencingRuleParser.parse("IsRatePlanCode('WMT')") must be(IsRatePlanCode("WMT"))
   }
 
 }
